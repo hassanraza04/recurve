@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: sync env
+        run: uv sync --frozen
+
+      - name: ruff
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: dbt parse
+        env:
+          RECURVE_WAREHOUSE_PATH: /tmp/ci.duckdb
+        run: |
+          uv run dbt deps --project-dir pipeline/transform/recurve
+          uv run dbt parse \
+            --project-dir pipeline/transform/recurve \
+            --profiles-dir pipeline/transform/recurve
+
+      - name: sqlfluff (dbt models, once they exist)
+        env:
+          RECURVE_WAREHOUSE_PATH: /tmp/ci.duckdb
+        run: |
+          if [ -n "$(find pipeline/transform/recurve/models -name '*.sql' 2>/dev/null)" ]; then
+            uv run sqlfluff lint pipeline/transform/recurve/models
+          else
+            echo "no dbt models yet — skipping sqlfluff"
+          fi
+
+      - name: pytest
+        run: uv run pytest -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
