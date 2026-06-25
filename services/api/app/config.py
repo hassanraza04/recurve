@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     warehouse_path: str = "data/local/recurve.duckdb"
 
     # Fernet key used to encrypt connection credentials at rest.
-    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    # See .env.example for the one-liner that generates a key.
     fernet_key: str = ""
 
     # CORS — the Next.js app origin(s) allowed to call this API

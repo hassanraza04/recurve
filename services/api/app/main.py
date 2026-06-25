@@ -62,7 +62,11 @@ def run(tenant_id: str) -> None:
     )
 
 
-@app.get("/v1/metrics/{tenant_id}/overview", tags=["metrics"], status_code=status.HTTP_501_NOT_IMPLEMENTED)
+@app.get(
+    "/v1/metrics/{tenant_id}/overview",
+    tags=["metrics"],
+    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+)
 def metrics_overview(tenant_id: str) -> None:
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
