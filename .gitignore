@@ -1,0 +1,64 @@
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# next
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+next-env.d.ts
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.uv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# dlt
+.dlt/secrets.toml
+.dlt/*.duckdb
+
+# dagster
+.dagster/
+tmp_dagster_home_*/
+*.tmp.dagster
+
+# warehouse (local duckdb)
+*.duckdb
+*.duckdb.wal
+data/local/*.duckdb
+
+# ml artifacts
+*.pkl
+*.joblib
+pipeline/ml/artifacts/
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+
+# logs
+*.log
