@@ -60,9 +60,7 @@ pipeline/ml/artifacts/
 *.swp
 Thumbs.db
 
-# claude code — keep only the shared preview launch config
-.claude/*
-!.claude/launch.json
+.claude/
 
 # logs
 *.log

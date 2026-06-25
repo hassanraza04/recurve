@@ -58,3 +58,5 @@ select = ["E", "F", "I", "UP", "B"]
 testpaths = ["services", "pipeline"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "--import-mode=importlib"
+# the orchestration package loads as a top-level module (matching `dagster dev`)
+pythonpath = ["pipeline/orchestration"]
