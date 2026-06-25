@@ -57,3 +57,4 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["services", "pipeline"]
 python_files = ["test_*.py", "*_test.py"]
+addopts = "--import-mode=importlib"
