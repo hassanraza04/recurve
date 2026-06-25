@@ -1,0 +1,61 @@
+name: recurve
+
+# Local dev stack. `docker compose up` brings the whole thing; `docker compose
+# up postgres` brings just the control-plane DB (handy before the images are
+# built). The Next.js app runs on the host (npm run dev) against the API.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: recurve
+      POSTGRES_PASSWORD: recurve
+      POSTGRES_DB: recurve
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recurve -d recurve"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      ["uvicorn", "services.api.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      RECURVE_DATABASE_URL: postgresql+psycopg://recurve:recurve@postgres:5432/recurve
+      RECURVE_ENVIRONMENT: local
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services:/app/services
+      - ./pipeline:/app/pipeline
+
+  dagster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/pipeline/orchestration
+    command:
+      ["dagster", "dev", "-m", "recurve_orchestration.definitions", "--host", "0.0.0.0", "--port", "3000"]
+    environment:
+      DAGSTER_HOME: /app/.dagster
+      RECURVE_DATABASE_URL: postgresql+psycopg://recurve:recurve@postgres:5432/recurve
+    ports:
+      - "3001:3000" # 3000 is taken by the Next.js app on the host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./pipeline:/app/pipeline
+
+volumes:
+  pgdata:
