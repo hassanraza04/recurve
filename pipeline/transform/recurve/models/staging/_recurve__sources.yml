@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: stripe_raw
+    description: >
+      Raw Stripe objects landed by dlt. Every row carries a tenant_id stamped at
+      ingest — the warehouse is multi-tenant and isolation is enforced downstream.
+    schema: raw
+    tables:
+      - name: customers
+        description: Stripe customers (one per billing account).
+      - name: subscriptions
+        description: Subscription lifecycle — status, periods, cancel timestamps.
+      - name: subscription_items
+        description: Line items linking a subscription to a price/quantity.
+      - name: invoices
+        description: Issued invoices with amounts and paid status.
+      - name: prices
+        description: Price/plan catalog — unit amount, interval, tier.

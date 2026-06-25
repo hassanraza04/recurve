@@ -1,0 +1,27 @@
+name: "recurve"
+version: "0.1.0"
+config-version: 2
+profile: "recurve"
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  recurve:
+    # clean + cast, keep tenant_id; cheap to rebuild
+    staging:
+      +materialized: view
+      +schema: staging
+    # the hard part: subscriptions -> monthly periods -> MRR movement type
+    intermediate:
+      +materialized: ephemeral
+    # the §7 schema everything else reads from
+    marts:
+      +materialized: table
+      +schema: marts
